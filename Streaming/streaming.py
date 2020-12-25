@@ -20,51 +20,48 @@ from time import time
 spark = SparkSession.builder \
     .appName('Amazon Review Analytic Spark Streaming') \
     .master('spark://hoangnam-msi:7077')\
-    .config('spark.executor.memory', '3g')\
+    .config('spark.executor.memory', '2g')\
     .config('spark.driver.memory', '2g')\
     .config('spark.scheduler.mode', 'FAIR')\
     .getOrCreate()
 spark.sparkContext.setLogLevel("WARN")
+
+
 df = spark \
     .readStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "hoangnam-msi:9092") \
     .option("subscribe", "bigdata") \
-    .load()
-df = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+    .load() \
+    .selectExpr("CAST(value AS STRING)")
 
 
-def test(df, eid):
+def foreach_batch_function(dfBatch, bid):
+    rdd = dfBatch.rdd.map(lambda r: r.value)
+    df = spark.read.json(rdd)
+    # Transform and write batchDF
+    df = predict(df)
 
-    print(df)
-    df.show()
+    # ds = df \
+    #     .selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)") \
+    #     .writeStream \
+    #     .format("kafka") \
+    #     .option("kafka.bootstrap.servers", "192.168.1.5:9092") \
+    #     .option("topic", "bigdata") \
+    #     .start()
 
 
-query = df.writeStream.foreachBatch(test).start()
+def predict(df):
+    # df = df.dropna(subset=['reviewText'])
+    if(df.count() > 0):
+        df = df.withColumn('review', lower(df["reviewText"]))
+        model = PipelineModel.load(
+            'file:///home/hoangnam/App/btl/20201-LTXLDLL/TraningModel/AMS_Model')
+        prediction = model.transform(df)
+        selected = prediction.select(['prediction'])
+        prediction.show()
+        return prediction
+
+
+query = df.writeStream.foreachBatch(foreach_batch_function).start()
 query.awaitTermination()
-
-
-# df.writeStream.foreachBatch(foreach_batch_function).start()
-
-
-# def predict(df):
-#     df = df.dropna(subset=['reviewText'])
-#     df = df.withColumn('review', lower(df["reviewText"]))
-#     model = PipelineModel.load('hdfs://hoangnam-msi:9000/user/hoangnam/btl/AMS_Model')
-#     prediction = model.transform(df)
-#     selected = prediction.select(['prediction'])
-#     for row in selected.collect():
-#         print(row)
-#     return prediction
-
-# def foreach_batch_function(df, epoch_id):
-#     df.show()
-#     # Transform and write batchDF
-#     df = predict(df)
-#     ds = df \
-#     .selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)") \
-#     .writeStream \
-#     .format("kafka") \
-#     .option("kafka.bootstrap.servers", "192.168.1.5:9092") \
-#     .option("topic", "bigdata") \
-#     .start()
