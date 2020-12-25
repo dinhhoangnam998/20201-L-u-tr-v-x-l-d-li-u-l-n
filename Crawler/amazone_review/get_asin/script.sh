@@ -1,0 +1,1 @@
+spark-submit ./get_asin_from_data.py
