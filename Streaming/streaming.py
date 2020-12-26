@@ -15,14 +15,15 @@ from pyspark.sql import SparkSession
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.mllib.evaluation import MulticlassMetrics
 from time import time
+from pyspark.sql.functions import to_json, col, struct
 
 
 spark = SparkSession.builder \
     .appName('Amazon Review Analytic Spark Streaming') \
     .master('spark://hoangnam-msi:7077')\
-    .config('spark.executor.memory', '2g')\
+    .config('spark.executor.memory', '3g')\
     .config('spark.driver.memory', '2g')\
-    .config('spark.scheduler.mode', 'FAIR')\
+    .config("spark.mongodb.output.uri", "mongodb://hoangnam-msi/btl.predict_output") \
     .getOrCreate()
 spark.sparkContext.setLogLevel("WARN")
 
@@ -41,14 +42,14 @@ def foreach_batch_function(dfBatch, bid):
     df = spark.read.json(rdd)
     # Transform and write batchDF
     df = predict(df)
-
-    # ds = df \
-    #     .selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)") \
-    #     .writeStream \
-    #     .format("kafka") \
-    #     .option("kafka.bootstrap.servers", "192.168.1.5:9092") \
-    #     .option("topic", "bigdata") \
-    #     .start()
+    if (df is not None):
+        df.select(to_json(struct([col(c).alias(c) for c in df.columns])).alias("value")) \
+            .write \
+            .format("kafka") \
+            .option("kafka.bootstrap.servers", "hoangnam-msi:9092") \
+            .option("topic", "predict_output") \
+            .save()
+        # df.write.format("mongo").mode("append").save()
 
 
 def predict(df):
@@ -56,7 +57,7 @@ def predict(df):
     if(df.count() > 0):
         df = df.withColumn('review', lower(df["reviewText"]))
         model = PipelineModel.load(
-            'file:///home/hoangnam/App/btl/20201-LTXLDLL/TraningModel/AMS_Model')
+            'hdfs:///user/hoangnam/btl/AMS_Model')
         prediction = model.transform(df)
         selected = prediction.select(['prediction'])
         prediction.show()
