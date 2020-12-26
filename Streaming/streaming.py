@@ -21,7 +21,7 @@ from pyspark.sql.functions import to_json, col, struct
 spark = SparkSession.builder \
     .appName('Amazon Review Analytic Spark Streaming') \
     .master('spark://hoangnam-msi:7077')\
-    .config('spark.executor.memory', '3g')\
+    .config('spark.executor.memory', '2g')\
     .config('spark.driver.memory', '2g')\
     .config("spark.mongodb.output.uri", "mongodb://hoangnam-msi/btl.predict_output") \
     .getOrCreate()
@@ -57,7 +57,7 @@ def predict(df):
     if(df.count() > 0):
         df = df.withColumn('review', lower(df["reviewText"]))
         model = PipelineModel.load(
-            'hdfs:///user/hoangnam/btl/AMS_Model')
+            'hdfs://hoangnam-msi:9000/user/hoangnam/btl/AMS_Model')
         prediction = model.transform(df)
         selected = prediction.select(['prediction'])
         prediction.show()
