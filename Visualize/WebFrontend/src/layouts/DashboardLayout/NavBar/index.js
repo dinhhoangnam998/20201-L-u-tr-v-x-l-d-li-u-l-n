@@ -15,9 +15,9 @@ import {
 import NavItem from "./NavItem";
 
 const user = {
-  avatar: "/static/images/avatars/avatar_6.png",
-  jobTitle: "Senior Developer",
-  name: "Katarina Smith",
+  avatar: "",
+  jobTitle: "BTL LTXLDLL",
+  name: "Nhom NTTD",
 };
 
 const items = [
@@ -27,40 +27,40 @@ const items = [
     title: "Dashboard",
   },
   {
-    href: "/app/customers",
+    href: "/app/bang-du-lieu",
     icon: UsersIcon,
-    title: "Customers",
+    title: "Bang du lieu",
   },
-  {
-    href: "/app/products",
-    icon: ShoppingBagIcon,
-    title: "Products",
-  },
-  {
-    href: "/app/account",
-    icon: UserIcon,
-    title: "Account",
-  },
-  {
-    href: "/app/settings",
-    icon: SettingsIcon,
-    title: "Settings",
-  },
-  {
-    href: "/login",
-    icon: LockIcon,
-    title: "Login",
-  },
-  {
-    href: "/register",
-    icon: UserPlusIcon,
-    title: "Register",
-  },
-  {
-    href: "/404",
-    icon: AlertCircleIcon,
-    title: "Error",
-  },
+  // {
+  //   href: "/app/products",
+  //   icon: ShoppingBagIcon,
+  //   title: "Products",
+  // },
+  // {
+  //   href: "/app/account",
+  //   icon: UserIcon,
+  //   title: "Account",
+  // },
+  // {
+  //   href: "/app/settings",
+  //   icon: SettingsIcon,
+  //   title: "Settings",
+  // },
+  // {
+  //   href: "/login",
+  //   icon: LockIcon,
+  //   title: "Login",
+  // },
+  // {
+  //   href: "/register",
+  //   icon: UserPlusIcon,
+  //   title: "Register",
+  // },
+  // {
+  //   href: "/404",
+  //   icon: AlertCircleIcon,
+  //   title: "Error",
+  // },
 ];
 
 const useStyles = makeStyles(() => ({
