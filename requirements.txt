@@ -1,0 +1,4 @@
+numpy
+pyspark
+kafka-python
+scrapy

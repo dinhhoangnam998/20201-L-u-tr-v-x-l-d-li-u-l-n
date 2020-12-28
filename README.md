@@ -19,6 +19,11 @@ Tuy nhiên, tập dữ liệu về các review là rất lớn, nên cần phả
 - Scrapy
 - Kafka
 
+
+## Cài đặt môi trường
+- cài đặt các thư viện theo lệnh sau:
+`pip install -r requirements.txt`
+
 ## Quá trình thực hiện
 - Setup HDFS, Spark, ...
 - Download tập dữ liệu, đẩy vào HDFS
@@ -29,4 +34,5 @@ Tuy nhiên, tập dữ liệu về các review là rất lớn, nên cần phả
   + Crawl dữ liệu về, đẩy vào kafka
   + Spark Streaming đọc dữ liệu từ kafka, dự đoán liên tục
   + Show kết quả
-  
+(Xem các file how_to_run.txt và how_to_run.md trong các module để chạy các tác vụ)
+
